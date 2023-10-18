@@ -22,3 +22,8 @@ bin/dev/update
 bin/dev/audit
 bin/dev/shipit
 ```
+
+## References
+
+- https://gist.github.com/sasa1977/5967224
+
