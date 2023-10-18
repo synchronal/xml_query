@@ -12,7 +12,7 @@ defmodule XmlQuery.MixProject do
       dialyzer: dialyzer(),
       docs: docs(),
       elixir: "~> 1.15",
-      elixir_paths: elixirc_paths(Mix.env()),
+      elixirc_paths: elixirc_paths(Mix.env()),
       homepage_url: @scm_url,
       name: "XmlQuery",
       package: package(),
@@ -23,7 +23,7 @@ defmodule XmlQuery.MixProject do
 
   def application,
     do: [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :xmerl]
     ]
 
   def cli,
@@ -39,7 +39,7 @@ defmodule XmlQuery.MixProject do
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.28", only: [:docs, :dev], runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
-      {:moar, "~> 1.10"}
+      {:moar, "~> 1.10", only: [:test]}
     ]
 
   defp dialyzer,
