@@ -8,6 +8,7 @@ defmodule Test.SimpleCase do
   using do
     quote do
       import Moar.Assertions
+      import Moar.Sugar
     end
   end
 end
