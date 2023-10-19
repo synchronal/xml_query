@@ -8,7 +8,7 @@ defmodule XmlQueryTest do
   describe "all" do
     test "returns an empty list when xpath does not match any elements" do
       """
-      <?xml version = "1.0"?>
+      <?xml version="1.0"?>
       <root>
         <child attribute="thing" />
       </root>
@@ -19,7 +19,7 @@ defmodule XmlQueryTest do
 
     test "returns a list of xml elements that match the given xpath" do
       """
-      <?xml version = "1.0"?>
+      <?xml version="1.0"?>
       <root>
         <child attribute="thing" />
         <child attribute="other-thing" />
@@ -27,35 +27,27 @@ defmodule XmlQueryTest do
       """
       |> Xq.all("//child")
       |> assert_eq([
-        Xq.xmlElement(
-          name: :child,
-          expanded_name: :child,
+        xml_element(
+          :child,
           parents: [root: 1],
           pos: 2,
-          xmlbase: ~c"/",
-          attributes: [
-            Xq.xmlAttribute(
-              name: :attribute,
+          attrs: [
+            xml_attribute(
+              :attribute,
               parents: [child: 2, root: 1],
-              pos: 1,
-              value: ~c"thing",
-              normalized: false
+              value: ~c"thing"
             )
           ]
         ),
-        Xq.xmlElement(
-          name: :child,
-          expanded_name: :child,
+        xml_element(
+          :child,
           parents: [root: 1],
           pos: 4,
-          xmlbase: ~c"/",
-          attributes: [
-            Xq.xmlAttribute(
-              name: :attribute,
+          attrs: [
+            xml_attribute(
+              :attribute,
               parents: [child: 4, root: 1],
-              pos: 1,
-              value: ~c"other-thing",
-              normalized: false
+              value: ~c"other-thing"
             )
           ]
         )
@@ -66,21 +58,30 @@ defmodule XmlQueryTest do
   describe "parse" do
     test "can parse an XML string" do
       """
-      <?xml version = "1.0"?>
+      <?xml version="1.0"?>
       <root>
         <child attribute="thing" />
       </root>
       """
       |> Xq.parse()
       |> assert_eq(
-        {:xmlElement, :root, :root, [], {:xmlNamespace, [], []}, [], 1, [],
-         [
-           {:xmlText, [root: 1], 1, [], ~c"\n  ", :text},
-           {:xmlElement, :child, :child, [], {:xmlNamespace, [], []}, [root: 1], 2,
-            [{:xmlAttribute, :attribute, [], [], [], [child: 2, root: 1], 1, [], ~c"thing", false}], [], [], ~c"/",
-            :undeclared},
-           {:xmlText, [root: 1], 3, [], ~c"\n", :text}
-         ], [], ~c"/", :undeclared}
+        xml_element(:root,
+          children: [
+            xml_text("\n  ", parents: [root: 1]),
+            xml_element(:child,
+              parents: [root: 1],
+              pos: 2,
+              attrs: [
+                xml_attribute(
+                  :attribute,
+                  parents: [child: 2, root: 1],
+                  value: ~c"thing"
+                )
+              ]
+            ),
+            xml_text("\n", pos: 3, parents: [root: 1])
+          ]
+        )
       )
     end
 
@@ -88,11 +89,9 @@ defmodule XmlQueryTest do
       xml =
         {:xmlElement, :root, :root, [], {:xmlNamespace, [], []}, [], 1, [],
          [
-           {:xmlText, [root: 1], 1, [], ~c"\n  ", :text},
            {:xmlElement, :child, :child, [], {:xmlNamespace, [], []}, [root: 1], 2,
             [{:xmlAttribute, :attribute, [], [], [], [child: 2, root: 1], 1, [], ~c"thing", false}], [], [], ~c"/",
-            :undeclared},
-           {:xmlText, [root: 1], 3, [], ~c"\n", :text}
+            :undeclared}
          ], [], ~c"/", :undeclared}
 
       assert Xq.parse(xml) == xml

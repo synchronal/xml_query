@@ -26,4 +26,5 @@ bin/dev/shipit
 ## References
 
 - https://gist.github.com/sasa1977/5967224
+- https://medium.com/erlang-battleground/the-hidden-xml-simplifier-a5f66e10c928
 
