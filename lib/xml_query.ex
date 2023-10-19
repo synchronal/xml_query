@@ -10,6 +10,7 @@ defmodule XmlQuery do
   Record.defrecord(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
   Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
 
+  @type xml() :: xml_binary() | xml_document() | xml_element()
   @type xml_binary() :: binary()
   @type xml_element() :: record(:xmlElement)
   @type xml_document() :: record(:xmlDocument)
@@ -19,7 +20,7 @@ defmodule XmlQuery do
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
   """
-  @spec all(xml_binary() | xml_document(), xpath()) :: []
+  @spec all(xml(), xpath()) :: []
   def all(xml, xpath) when is_binary(xpath),
     do: xml |> all(String.to_charlist(xpath))
 
@@ -41,7 +42,7 @@ defmodule XmlQuery do
   xml_element(:root)
   ```
   """
-  @spec parse(xml_binary() | xml_document()) :: xml_document()
+  @spec parse(xml()) :: xml_document() | xml_element()
   def parse(xml) when is_tuple(xml),
     do: xml
 
