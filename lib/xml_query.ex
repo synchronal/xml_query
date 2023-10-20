@@ -1,4 +1,6 @@
 defmodule XmlQuery do
+  # @related [tests](test/xml_query_test.exs)
+
   @moduledoc """
   Some simple XML query functions.
   """
