@@ -5,6 +5,7 @@ defmodule XmlQuery do
   Some simple XML query functions.
   """
 
+  alias XmlQuery.QueryError
   require Record
 
   Record.defrecord(:xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl"))
@@ -55,6 +56,13 @@ defmodule XmlQuery do
     do: xml |> all(xpath) |> List.first()
 
   @doc """
+  Like `find/2` but raises unless exactly one node is found.
+  """
+  @spec find!(xml(), xpath()) :: xml_element()
+  def find!(xml, xpath),
+    do: all(xml, xpath) |> first!("XPath: #{xpath}")
+
+  @doc """
   Parses an XML document using `:xmerl_scan.string/2`, returning an `:xmlDocument` record.
 
   ```elixir
@@ -78,5 +86,26 @@ defmodule XmlQuery do
 
     [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
     doc
+  end
+
+  # # #
+
+  defp first!([], hint) do
+    raise(QueryError, """
+    Expected a single XML element but found none.
+
+    #{hint}
+    """)
+  end
+
+  defp first!([element], _hint),
+    do: element
+
+  defp first!(_xml, hint) do
+    raise QueryError, """
+    Expected a single XML node but found multiple:
+
+    #{hint}
+    """
   end
 end
