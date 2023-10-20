@@ -55,6 +55,43 @@ defmodule XmlQueryTest do
     end
   end
 
+  describe "find" do
+    test "can find the first element `xml` that matches an `xpath`" do
+      """
+      <?xml version="1.0"?>
+      <root>
+        <child attribute="thing" />
+        <child attribute="other-thing" />
+      </root>
+      """
+      |> Xq.find("//child")
+      |> assert_eq(
+        xml_element(:child,
+          parents: [root: 1],
+          pos: 2,
+          attrs: [
+            xml_attribute(:attribute,
+              parents: [child: 2, root: 1],
+              value: ~c"thing"
+            )
+          ]
+        )
+      )
+    end
+
+    test "is nil when no element matches the given `xpath`" do
+      """
+      <?xml version="1.0"?>
+      <root>
+        <child attribute="thing" />
+        <child attribute="other-thing" />
+      </root>
+      """
+      |> Xq.find("//sibling")
+      |> assert_eq(nil)
+    end
+  end
+
   describe "parse" do
     test "can parse an XML string" do
       """
