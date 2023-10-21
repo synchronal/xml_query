@@ -101,10 +101,26 @@ defmodule XmlQuery do
   def parse([%XmlQuery.Element{} | _] = list),
     do: list
 
-  @doc "TODO"
+  @doc """
+  Returns the text value of `xml`.
+  """
   @spec text(xml()) :: binary()
-  def text(_xml),
-    do: raise("TODO")
+  def text(xml) do
+    case xml
+         |> parse()
+         |> first!("Consider using Enum.map(xml, &#{@module_name}.text/1)") do
+      %XmlQuery.Element{shadows: doc} ->
+        [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
+
+        :xmerl_xpath.string(~c"//text()", doc)
+        |> Enum.reduce("", fn node, acc ->
+          case XmlQuery.Text.to_string(node) do
+            "" -> acc
+            text -> String.trim(acc <> " " <> text)
+          end
+        end)
+    end
+  end
 
   # # #
 

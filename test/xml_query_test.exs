@@ -211,4 +211,35 @@ defmodule XmlQueryTest do
       assert %Xq.Element{name: :root, attributes: []} = Xq.parse(xml)
     end
   end
+
+  describe "text" do
+    @xml """
+    <?xml version="1.0"?>
+    <root>
+      <child>P1</child>
+      <child nested="true">P2 <nested>nested</nested></child>
+      <child>P3</child>
+    </root>
+    """
+
+    test "returns the text value of the XML node" do
+      @xml |> Xq.find("//root") |> Xq.text() |> assert_eq("P1 P2 nested P3")
+      @xml |> Xq.find("//child") |> Xq.text() |> assert_eq("P1")
+      @xml |> Xq.find("//child[@nested='true']") |> Xq.text() |> assert_eq("P2 nested")
+    end
+
+    test "requires the use of `Enum.map` to get a list" do
+      @xml |> Xq.all("//child") |> Enum.map(&Xq.text/1) |> assert_eq(["P1", "P2 nested", "P3"])
+    end
+
+    test "raises if a list or XML tree is passed in" do
+      assert_raise XmlQuery.QueryError,
+                   """
+                   Expected a single XML node but found multiple:
+
+                   Consider using Enum.map(xml, &XmlQuery.text/1)
+                   """,
+                   fn -> @xml |> Xq.all("child") |> Xq.text() end
+    end
+  end
 end

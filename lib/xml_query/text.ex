@@ -19,4 +19,7 @@ defmodule XmlQuery.Text do
         contents: XmlQuery.Xmerl.xmlText(text, :value),
         shadows: text
       )
+
+  def to_string(node) when is_record(node, :xmlText),
+    do: node |> XmlQuery.Xmerl.xmlText(:value) |> Kernel.to_string()
 end
