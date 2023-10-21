@@ -5,60 +5,54 @@ defmodule XmlQuery do
   Some simple XML query functions.
   """
 
+  import Record
   alias XmlQuery.QueryError
-  require Record
 
   Record.defrecord(:xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl"))
   Record.defrecord(:xmlDocument, Record.extract(:xmlDocument, from_lib: "xmerl/include/xmerl.hrl"))
   Record.defrecord(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
   Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
 
-  @type xml() :: xml_binary() | xml_document() | xml_element()
+  @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t()
   @type xml_binary() :: binary()
-  @type xml_element() :: record(:xmlElement)
   @type xml_document() :: record(:xmlDocument)
+  @type xml_element() :: record(:xmlElement)
   @type xpath() :: binary() | charlist()
 
   @doc """
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
   """
-  @spec all(xml(), xpath()) :: [xml_element()]
+  @spec all(xml(), xpath()) :: [XmlQuery.Element.t()]
   def all(xml, xpath) when is_binary(xpath),
     do: xml |> all(String.to_charlist(xpath))
 
-  def all(xml, xpath) when is_tuple(xml),
-    do: :xmerl_xpath.string(xpath, xml)
-
-  def all(xml, xpath) when is_binary(xml),
+  def all(xml, xpath) when is_binary(xml) or is_tuple(xml),
     do: xml |> parse() |> all(xpath)
+
+  def all(xml, xpath) when is_struct(xml),
+    do: :xmerl_xpath.string(xpath, xml.shadows) |> Enum.map(&into/1)
 
   @doc """
   Finds the first element `xml` that matches `xpath`.
 
   ```elixir
+  iex> alias XmlQuery, as: Xq
   iex> xml = \"""
   ...> <?xml version="1.0"?>
   ...> <root><child property="oldest" /><child property="youngest" /></root>
   ...> \"""
-  iex> XmlQuery.find(xml, "//child")
-  xml_element(:child, parents: [root: 1], pos: 1, attrs: [xml_attribute(:property, parents: [child: 1, root: 1], value: ~c"oldest")])
+  iex> %Xq.Element{name: :child, attributes: [%Xq.Attribute{value: ~c"oldest"}]} = Xq.find(xml, "//child")
   ```
   """
-  @spec find(xml(), xpath()) :: xml_element() | nil
-  def find(xml, xpath) when is_binary(xpath),
-    do: xml |> find(String.to_charlist(xpath))
-
-  def find(xml, xpath) when is_binary(xml),
-    do: xml |> parse() |> find(xpath)
-
-  def find(xml, xpath) when is_tuple(xml),
+  @spec find(xml(), xpath()) :: XmlQuery.Element.t() | nil
+  def find(xml, xpath),
     do: xml |> all(xpath) |> List.first()
 
   @doc """
   Like `find/2` but raises unless exactly one node is found.
   """
-  @spec find!(xml(), xpath()) :: xml_element()
+  @spec find!(xml(), xpath()) :: XmlQuery.Element.t()
   def find!(xml, xpath),
     do: all(xml, xpath) |> first!("XPath: #{xpath}")
 
@@ -70,13 +64,12 @@ defmodule XmlQuery do
   ...> <?xml version="1.0"?>
   ...> <root />
   ...> \"""
-  iex> XmlQuery.parse(xml)
-  xml_element(:root)
+  iex> %Xq.Element{name: :root} = XmlQuery.parse(xml)
   ```
   """
-  @spec parse(xml()) :: xml_document() | xml_element()
+  @spec parse(xml()) :: XmlQuery.Element.t()
   def parse(xml) when is_tuple(xml),
-    do: xml
+    do: xml |> into()
 
   def parse(xml) when is_binary(xml) do
     {doc, []} =
@@ -85,8 +78,22 @@ defmodule XmlQuery do
       |> :xmerl_scan.string(quiet: true, xmlbase: ~c"/")
 
     [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
-    doc
+    into(doc)
   end
+
+  # # #
+
+  @doc false
+  def into(nil), do: nil
+
+  def into(attribute) when is_record(attribute, :xmlAttribute),
+    do: XmlQuery.Attribute.new(attribute)
+
+  def into(element) when is_record(element, :xmlElement),
+    do: XmlQuery.Element.new(element)
+
+  def into(text) when is_record(text, :xmlText),
+    do: XmlQuery.Text.new(text)
 
   # # #
 

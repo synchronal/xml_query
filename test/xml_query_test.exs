@@ -18,88 +18,67 @@ defmodule XmlQueryTest do
     end
 
     test "returns a list of xml elements that match the given xpath" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-        <child attribute="other-thing" />
-      </root>
-      """
-      |> Xq.all("//child")
-      |> assert_eq([
-        xml_element(
-          :child,
-          parents: [root: 1],
-          pos: 2,
-          attrs: [
-            xml_attribute(
-              :attribute,
-              parents: [child: 2, root: 1],
-              value: ~c"thing"
-            )
-          ]
-        ),
-        xml_element(
-          :child,
-          parents: [root: 1],
-          pos: 4,
-          attrs: [
-            xml_attribute(
-              :attribute,
-              parents: [child: 4, root: 1],
-              value: ~c"other-thing"
-            )
-          ]
-        )
-      ])
+      assert [
+               %Xq.Element{
+                 name: :child,
+                 attributes: [
+                   %Xq.Attribute{name: :attribute, value: ~c"thing"}
+                 ]
+               },
+               %Xq.Element{
+                 name: :child,
+                 attributes: [
+                   %Xq.Attribute{name: :attribute, value: ~c"other-thing"}
+                 ]
+               }
+             ] =
+               """
+               <?xml version="1.0"?>
+               <root>
+                 <child attribute="thing" />
+                 <child attribute="other-thing" />
+               </root>
+               """
+               |> Xq.all("//child")
     end
   end
 
   describe "find" do
     test "can find the first element `xml` that matches an `xpath` for an element" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-        <child attribute="other-thing" />
-      </root>
-      """
-      |> Xq.find("//child")
-      |> assert_eq(
-        xml_element(:child,
-          parents: [root: 1],
-          pos: 2,
-          attrs: [
-            xml_attribute(:attribute,
-              parents: [child: 2, root: 1],
-              value: ~c"thing"
-            )
-          ]
-        )
-      )
+      assert %Xq.Element{
+               name: :child,
+               attributes: [
+                 %Xq.Attribute{
+                   name: :attribute,
+                   value: ~c"thing"
+                 }
+               ]
+             } =
+               """
+               <?xml version="1.0"?>
+               <root>
+                 <child attribute="thing" />
+                 <child attribute="other-thing" />
+               </root>
+               """
+               |> Xq.find("//child")
     end
 
     test "can find the first element `xml` that matches an `xpath` for element with an attribute value" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-        <child attribute="other-thing" />
-      </root>
-      """
-      |> Xq.find("//child[@attribute='other-thing']")
-      |> assert_eq(
-        xml_element(:child,
-          parents: [root: 1],
-          pos: 4,
-          attrs: [
-            xml_attribute(:attribute,
-              parents: [child: 4, root: 1],
-              value: ~c"other-thing"
-            )
-          ]
-        )
-      )
+      assert %Xq.Element{
+               name: :child,
+               attributes: [
+                 %Xq.Attribute{name: :attribute, value: ~c"other-thing"}
+               ]
+             } =
+               """
+               <?xml version="1.0"?>
+               <root>
+                 <child attribute="thing" />
+                 <child attribute="other-thing" />
+               </root>
+               """
+               |> Xq.find("//child[@attribute='other-thing']")
     end
 
     test "is nil when no element matches the given `xpath`" do
@@ -117,25 +96,19 @@ defmodule XmlQueryTest do
 
   describe "find!" do
     test "can find the first element `xml` that matches an `xpath`" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-      </root>
-      """
-      |> Xq.find!("//child")
-      |> assert_eq(
-        xml_element(:child,
-          parents: [root: 1],
-          pos: 2,
-          attrs: [
-            xml_attribute(:attribute,
-              parents: [child: 2, root: 1],
-              value: ~c"thing"
-            )
-          ]
-        )
-      )
+      assert %Xq.Element{
+               name: :child,
+               attributes: [
+                 %Xq.Attribute{name: :attribute, value: ~c"thing"}
+               ]
+             } =
+               """
+               <?xml version="1.0"?>
+               <root>
+                 <child attribute="thing" />
+               </root>
+               """
+               |> Xq.find!("//child")
     end
 
     test "fails if no element is found" do
@@ -179,35 +152,20 @@ defmodule XmlQueryTest do
 
   describe "parse" do
     test "can parse an XML string" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-      </root>
-      """
-      |> Xq.parse()
-      |> assert_eq(
-        xml_element(:root,
-          children: [
-            xml_text("\n  ", parents: [root: 1]),
-            xml_element(:child,
-              parents: [root: 1],
-              pos: 2,
-              attrs: [
-                xml_attribute(
-                  :attribute,
-                  parents: [child: 2, root: 1],
-                  value: ~c"thing"
-                )
-              ]
-            ),
-            xml_text("\n", pos: 3, parents: [root: 1])
-          ]
-        )
-      )
+      assert %Xq.Element{
+               name: :root,
+               attributes: []
+             } =
+               """
+               <?xml version="1.0"?>
+               <root>
+                 <child attribute="thing" />
+               </root>
+               """
+               |> Xq.parse()
     end
 
-    test "passes through xml tuples" do
+    test "wrap XML element records in Xq.Element" do
       xml =
         {:xmlElement, :root, :root, [], {:xmlNamespace, [], []}, [], 1, [],
          [
@@ -216,7 +174,7 @@ defmodule XmlQueryTest do
             :undeclared}
          ], [], ~c"/", :undeclared}
 
-      assert Xq.parse(xml) == xml
+      assert %Xq.Element{name: :root, attributes: []} = Xq.parse(xml)
     end
   end
 end
