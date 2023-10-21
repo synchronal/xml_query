@@ -43,6 +43,40 @@ defmodule XmlQueryTest do
     end
   end
 
+  describe "attr" do
+    @xml """
+    <?xml version="1.0"?>
+    <root>
+      <child attribute="thing" />
+      <child attribute="other-thing" />
+    </root>
+    """
+
+    test "can find an attribute on an element with the given name" do
+      @xml
+      |> Xq.find("//child")
+      |> Xq.attr("attribute")
+      |> assert_eq("thing")
+    end
+
+    test "returns nil if the attr does not exist" do
+      @xml
+      |> Xq.find("//root")
+      |> Xq.attr("attribute")
+      |> assert_eq(nil)
+    end
+
+    test "raises if the first argument is a list" do
+      assert_raise XmlQuery.QueryError,
+                   """
+                   Expected a single XML node but found multiple:
+
+                   Consider using Enum.map(html, &XmlQuery.attr(&1, "attribute"))
+                   """,
+                   fn -> @xml |> Xq.all("//child") |> Xq.attr("attribute") end
+    end
+  end
+
   describe "find" do
     test "can find the first element `xml` that matches an `xpath` for an element" do
       assert %Xq.Element{

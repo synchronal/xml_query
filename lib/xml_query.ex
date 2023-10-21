@@ -17,6 +17,8 @@ defmodule XmlQuery do
   @type xml_text() :: Xmerl.xml_text()
   @type xpath() :: binary() | charlist()
 
+  @module_name __MODULE__ |> Module.split() |> Enum.join(".")
+
   @doc """
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
@@ -31,10 +33,19 @@ defmodule XmlQuery do
   def all(xml, xpath) when is_struct(xml),
     do: :xmerl_xpath.string(xpath, xml.shadows) |> Enum.map(&into/1)
 
-  @doc "TODO"
+  @doc """
+  Returns the value of `attr` from the outermost element of `xml`.
+  """
   @spec attr(xml(), String.t()) :: XmlQuery.Attribute.t() | nil
-  def attr(_xml, _attribute_name),
-    do: raise("TODO")
+  def attr(xml, attr) do
+    case xml
+         |> parse()
+         |> first!("Consider using Enum.map(html, &#{@module_name}.attr(&1, #{inspect(attr)}))")
+         |> find("@#{attr}") do
+      %XmlQuery.Attribute{value: value} -> to_string(value)
+      nil -> nil
+    end
+  end
 
   @doc """
   Finds the first element `xml` that matches `xpath`.
@@ -48,7 +59,7 @@ defmodule XmlQuery do
   iex> %Xq.Element{name: :child, attributes: [%Xq.Attribute{value: ~c"oldest"}]} = Xq.find(xml, "//child")
   ```
   """
-  @spec find(xml(), xpath()) :: XmlQuery.Element.t() | nil
+  @spec find(xml(), xpath()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | nil
   def find(xml, xpath),
     do: xml |> all(xpath) |> List.first()
 
@@ -84,6 +95,12 @@ defmodule XmlQuery do
     into(doc)
   end
 
+  def parse(%XmlQuery.Element{} = element),
+    do: element
+
+  def parse([%XmlQuery.Element{} | _] = list),
+    do: list
+
   @doc "TODO"
   @spec text(xml()) :: binary()
   def text(_xml),
@@ -114,6 +131,9 @@ defmodule XmlQuery do
   end
 
   defp first!([element], _hint),
+    do: element
+
+  defp first!(%XmlQuery.Element{} = element, _hint),
     do: element
 
   defp first!(_xml, hint) do
