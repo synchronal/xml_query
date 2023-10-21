@@ -1,10 +1,8 @@
 defmodule XmlQuery.Attribute do
   import Record
-
-  Record.defrecord(:xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl"))
+  require XmlQuery
 
   @type t() :: %__MODULE__{}
-  @type xml_attribute() :: record(:xmlAttribute)
 
   @keys ~w[
     name
@@ -15,12 +13,12 @@ defmodule XmlQuery.Attribute do
   @enforce_keys @keys
   defstruct @keys
 
-  @spec new(xml_attribute()) :: t()
+  @spec new(XmlQuery.xml_attribute()) :: t()
   def new(attribute) when is_record(attribute, :xmlAttribute),
     do:
       __struct__(
-        name: xmlAttribute(attribute, :name),
-        value: xmlAttribute(attribute, :value),
+        name: XmlQuery.xmlAttribute(attribute, :name),
+        value: XmlQuery.xmlAttribute(attribute, :value),
         shadows: attribute
       )
 end

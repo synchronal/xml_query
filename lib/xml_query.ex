@@ -14,9 +14,11 @@ defmodule XmlQuery do
   Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
 
   @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t()
+  @type xml_attribute() :: record(:xmlAttribute)
   @type xml_binary() :: binary()
   @type xml_document() :: record(:xmlDocument)
   @type xml_element() :: record(:xmlElement)
+  @type xml_text() :: record(:xmlText)
   @type xpath() :: binary() | charlist()
 
   @doc """

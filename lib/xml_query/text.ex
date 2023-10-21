@@ -1,10 +1,8 @@
 defmodule XmlQuery.Text do
   import Record
-
-  Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
+  require XmlQuery
 
   @type t() :: %__MODULE__{}
-  @type xml_text() :: record(:xmlText)
 
   @keys ~w[
     contents
@@ -14,11 +12,11 @@ defmodule XmlQuery.Text do
   @enforce_keys @keys
   defstruct @keys
 
-  @spec new(xml_text()) :: t()
+  @spec new(XmlQuery.xml_text()) :: t()
   def new(text) when is_record(text, :xmlText),
     do:
       __struct__(
-        contents: xmlText(text, :value),
+        contents: XmlQuery.xmlText(text, :value),
         shadows: text
       )
 end
