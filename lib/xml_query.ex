@@ -33,6 +33,11 @@ defmodule XmlQuery do
   def all(xml, xpath) when is_struct(xml),
     do: :xmerl_xpath.string(xpath, xml.shadows) |> Enum.map(&into/1)
 
+  @doc "TODO"
+  @spec attr(xml(), String.t()) :: XmlQuery.Attribute.t() | nil
+  def attr(_xml, _attribute_name),
+    do: raise("TODO")
+
   @doc """
   Finds the first element `xml` that matches `xpath`.
 
@@ -77,9 +82,14 @@ defmodule XmlQuery do
       |> String.to_charlist()
       |> :xmerl_scan.string(quiet: true, xmlbase: ~c"/")
 
-    [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
+    # [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
     into(doc)
   end
+
+  @doc "TODO"
+  @spec text(xml()) :: binary()
+  def text(_xml),
+    do: raise("TODO")
 
   # # #
 
