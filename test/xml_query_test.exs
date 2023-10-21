@@ -71,7 +71,7 @@ defmodule XmlQueryTest do
                    """
                    Expected a single XML node but found multiple:
 
-                   Consider using Enum.map(html, &XmlQuery.attr(&1, "attribute"))
+                   Consider using Enum.map(xml, &XmlQuery.attr(&1, "attribute"))
                    """,
                    fn -> @xml |> Xq.all("//child") |> Xq.attr("attribute") end
     end

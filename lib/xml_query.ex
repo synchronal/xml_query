@@ -40,7 +40,7 @@ defmodule XmlQuery do
   def attr(xml, attr) do
     case xml
          |> parse()
-         |> first!("Consider using Enum.map(html, &#{@module_name}.attr(&1, #{inspect(attr)}))")
+         |> first!("Consider using Enum.map(xml, &#{@module_name}.attr(&1, #{inspect(attr)}))")
          |> find("@#{attr}") do
       %XmlQuery.Attribute{value: value} -> to_string(value)
       nil -> nil
