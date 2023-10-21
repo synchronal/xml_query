@@ -1,6 +1,6 @@
 defmodule XmlQuery.Element do
   import Record
-  require XmlQuery
+  require XmlQuery.Xmerl
 
   @type t() :: %__MODULE__{}
 
@@ -17,8 +17,8 @@ defmodule XmlQuery.Element do
   def new(element) when is_record(element, :xmlElement),
     do:
       __struct__(
-        name: XmlQuery.xmlElement(element, :name),
-        attributes: Enum.map(XmlQuery.xmlElement(element, :attributes), &XmlQuery.Attribute.new/1),
+        name: XmlQuery.Xmerl.xmlElement(element, :name),
+        attributes: Enum.map(XmlQuery.Xmerl.xmlElement(element, :attributes), &XmlQuery.Attribute.new/1),
         shadows: element
       )
 end

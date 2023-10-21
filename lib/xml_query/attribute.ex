@@ -1,6 +1,6 @@
 defmodule XmlQuery.Attribute do
   import Record
-  require XmlQuery
+  require XmlQuery.Xmerl
 
   @type t() :: %__MODULE__{}
 
@@ -17,8 +17,8 @@ defmodule XmlQuery.Attribute do
   def new(attribute) when is_record(attribute, :xmlAttribute),
     do:
       __struct__(
-        name: XmlQuery.xmlAttribute(attribute, :name),
-        value: XmlQuery.xmlAttribute(attribute, :value),
+        name: XmlQuery.Xmerl.xmlAttribute(attribute, :name),
+        value: XmlQuery.Xmerl.xmlAttribute(attribute, :value),
         shadows: attribute
       )
 end

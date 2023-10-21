@@ -1,6 +1,6 @@
 defmodule XmlQuery.Text do
   import Record
-  require XmlQuery
+  require XmlQuery.Xmerl
 
   @type t() :: %__MODULE__{}
 
@@ -16,7 +16,7 @@ defmodule XmlQuery.Text do
   def new(text) when is_record(text, :xmlText),
     do:
       __struct__(
-        contents: XmlQuery.xmlText(text, :value),
+        contents: XmlQuery.Xmerl.xmlText(text, :value),
         shadows: text
       )
 end

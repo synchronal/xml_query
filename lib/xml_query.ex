@@ -7,18 +7,14 @@ defmodule XmlQuery do
 
   import Record
   alias XmlQuery.QueryError
-
-  Record.defrecord(:xmlAttribute, Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecord(:xmlDocument, Record.extract(:xmlDocument, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecord(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
+  alias XmlQuery.Xmerl
 
   @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t()
-  @type xml_attribute() :: record(:xmlAttribute)
+  @type xml_attribute() :: Xmerl.xml_attribute()
   @type xml_binary() :: binary()
-  @type xml_document() :: record(:xmlDocument)
-  @type xml_element() :: record(:xmlElement)
-  @type xml_text() :: record(:xmlText)
+  @type xml_document() :: Xmerl.xml_document()
+  @type xml_element() :: Xmerl.xml_element()
+  @type xml_text() :: Xmerl.xml_text()
   @type xpath() :: binary() | charlist()
 
   @doc """
