@@ -52,7 +52,7 @@ defmodule XmlQuery do
   end
 
   @doc """
-  Finds the first element `xml` that matches `xpath`.
+  Finds the first element, attribute, or element text in `xml` that matches `xpath`.
 
   ```elixir
   iex> alias XmlQuery, as: Xq
@@ -75,7 +75,10 @@ defmodule XmlQuery do
     do: all(xml, xpath) |> first!("XPath: #{xpath}")
 
   @doc """
-  Parses an XML document using `:xmerl_scan.string/2`, returning an `:xmlDocument` record.
+  Parses an XML document using `:xmerl_scan.string/2`, returning an `XmlQuery.Element` struct.
+
+  Given an xml tuple that has already been created by `:xmerl`, wraps the tuple in an
+  `XmlQuery`-specific struct.
 
   ```elixir
   iex> xml = \"""
@@ -83,9 +86,15 @@ defmodule XmlQuery do
   ...> <root />
   ...> \"""
   iex> %Xq.Element{name: :root} = XmlQuery.parse(xml)
+
+  iex> xml = \"""
+  ...> <?xml version="1.0"?>
+  ...> <root property="root-value" />
+  ...> \"""
+  iex> %Xq.Attribute{name: :property, value: ~c"root-value"} = XmlQuery.find(xml, "//root/@property") |> XmlQuery.parse()
   ```
   """
-  @spec parse(xml()) :: XmlQuery.Element.t()
+  @spec parse(xml()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | XmlQuery.Text.t()
   def parse(node) when is_xml_struct(node),
     do: node
 
