@@ -49,8 +49,12 @@ defmodule XmlQuery.MixProject do
       plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
 
-  defp docs,
-    do: []
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "LICENSE.md"]
+    ]
+  end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
