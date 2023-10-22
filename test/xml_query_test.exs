@@ -78,7 +78,20 @@ defmodule XmlQueryTest do
   end
 
   describe "find" do
-    test "can find the first element `xml` that matches an `xpath` for an element" do
+    @xml """
+    <?xml version="1.0"?>
+    <root>
+      <child attribute="thing">child contents</child>
+      <child attribute="other-thing" />
+    </root>
+    """
+    test "is nil when no element matches the given `xpath`" do
+      @xml
+      |> Xq.find("//sibling")
+      |> assert_eq(nil)
+    end
+
+    test "can find the first element in `xml` that matches an `xpath` for an element" do
       assert %Xq.Element{
                name: :child,
                attributes: [
@@ -88,43 +101,36 @@ defmodule XmlQueryTest do
                  }
                ]
              } =
-               """
-               <?xml version="1.0"?>
-               <root>
-                 <child attribute="thing" />
-                 <child attribute="other-thing" />
-               </root>
-               """
+               @xml
                |> Xq.find("//child")
     end
 
-    test "can find the first element `xml` that matches an `xpath` for element with an attribute value" do
+    test "can find the first element in `xml` that matches an `xpath` for element with an attribute value" do
       assert %Xq.Element{
                name: :child,
                attributes: [
                  %Xq.Attribute{name: :attribute, value: ~c"other-thing"}
                ]
              } =
-               """
-               <?xml version="1.0"?>
-               <root>
-                 <child attribute="thing" />
-                 <child attribute="other-thing" />
-               </root>
-               """
+               @xml
                |> Xq.find("//child[@attribute='other-thing']")
     end
 
-    test "is nil when no element matches the given `xpath`" do
-      """
-      <?xml version="1.0"?>
-      <root>
-        <child attribute="thing" />
-        <child attribute="other-thing" />
-      </root>
-      """
-      |> Xq.find("//sibling")
-      |> assert_eq(nil)
+    test "can find the first attr in an `xml` element that matches an `xpath` for element and attribute" do
+      assert %Xq.Attribute{
+               name: :attribute,
+               value: ~c"thing"
+             } =
+               @xml
+               |> Xq.find("//child/@attribute")
+    end
+
+    test "can find the text in an `xml` that matches an `xpath`" do
+      assert %Xq.Text{
+               contents: ~c"child contents"
+             } =
+               @xml
+               |> Xq.find("//child/text()")
     end
   end
 

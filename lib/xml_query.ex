@@ -19,6 +19,10 @@ defmodule XmlQuery do
 
   @module_name __MODULE__ |> Module.split() |> Enum.join(".")
 
+  defguard is_xml_struct(struct)
+           when is_struct(struct) and
+                  struct.__struct__ in [XmlQuery.Attribute, XmlQuery.Element, XmlQuery.Text]
+
   @doc """
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
@@ -59,14 +63,14 @@ defmodule XmlQuery do
   iex> %Xq.Element{name: :child, attributes: [%Xq.Attribute{value: ~c"oldest"}]} = Xq.find(xml, "//child")
   ```
   """
-  @spec find(xml(), xpath()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | nil
+  @spec find(xml(), xpath()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | XmlQuery.Text.t() | nil
   def find(xml, xpath),
     do: xml |> all(xpath) |> List.first()
 
   @doc """
   Like `find/2` but raises unless exactly one node is found.
   """
-  @spec find!(xml(), xpath()) :: XmlQuery.Element.t()
+  @spec find!(xml(), xpath()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | XmlQuery.Text.t()
   def find!(xml, xpath),
     do: all(xml, xpath) |> first!("XPath: #{xpath}")
 
@@ -82,6 +86,12 @@ defmodule XmlQuery do
   ```
   """
   @spec parse(xml()) :: XmlQuery.Element.t()
+  def parse(node) when is_xml_struct(node),
+    do: node
+
+  def parse([node | _] = list) when is_xml_struct(node),
+    do: list
+
   def parse(xml) when is_tuple(xml),
     do: xml |> into()
 
@@ -91,15 +101,8 @@ defmodule XmlQuery do
       |> String.to_charlist()
       |> :xmerl_scan.string(quiet: true, xmlbase: ~c"/")
 
-    # [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
     into(doc)
   end
-
-  def parse(%XmlQuery.Element{} = element),
-    do: element
-
-  def parse([%XmlQuery.Element{} | _] = list),
-    do: list
 
   @doc """
   Returns the text value of `xml`.
@@ -149,8 +152,8 @@ defmodule XmlQuery do
   defp first!([element], _hint),
     do: element
 
-  defp first!(%XmlQuery.Element{} = element, _hint),
-    do: element
+  defp first!(node, _hint) when is_xml_struct(node),
+    do: node
 
   defp first!(_xml, hint) do
     raise QueryError, """
