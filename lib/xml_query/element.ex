@@ -1,4 +1,5 @@
 defmodule XmlQuery.Element do
+  # @related [tests](test/xml_query/element_test.exs)
   import Record
   require XmlQuery.Xmerl
 
@@ -21,4 +22,15 @@ defmodule XmlQuery.Element do
         attributes: Enum.map(XmlQuery.Xmerl.xmlElement(element, :attributes), &XmlQuery.Attribute.new/1),
         shadows: element
       )
+
+  defimpl String.Chars do
+    def to_string(element) do
+      [doc] = :xmerl_lib.remove_whitespace(List.wrap(element.shadows))
+
+      doc
+      |> :xmerl.export_simple_element(:xmerl_xml)
+      |> :lists.flatten()
+      |> Kernel.to_string()
+    end
+  end
 end
