@@ -1,4 +1,5 @@
 defmodule XmlQuery.Attribute do
+  # @related [tests](test/xml_query/attribute_test.exs)
   import Record
   require XmlQuery.Xmerl
 
@@ -21,4 +22,12 @@ defmodule XmlQuery.Attribute do
         value: XmlQuery.Xmerl.xmlAttribute(attribute, :value),
         shadows: attribute
       )
+
+  defimpl String.Chars do
+    def to_string(attr) do
+      attr.shadows
+      |> XmlQuery.Xmerl.xmlAttribute(:value)
+      |> Kernel.to_string()
+    end
+  end
 end

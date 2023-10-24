@@ -1,4 +1,5 @@
 defmodule XmlQuery.Text do
+  # @related [tests](test/xml_query/text_test.exs)
   import Record
   require XmlQuery.Xmerl
 
@@ -20,6 +21,15 @@ defmodule XmlQuery.Text do
         shadows: text
       )
 
+  @doc false
   def to_string(node) when is_record(node, :xmlText),
     do: node |> XmlQuery.Xmerl.xmlText(:value) |> Kernel.to_string()
+
+  defimpl String.Chars do
+    def to_string(text) do
+      text.shadows
+      |> XmlQuery.Xmerl.xmlText(:value)
+      |> Kernel.to_string()
+    end
+  end
 end
