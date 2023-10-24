@@ -25,11 +25,8 @@ defmodule XmlQuery.Element do
 
   defimpl String.Chars do
     def to_string(element) do
-      [doc] = :xmerl_lib.remove_whitespace(List.wrap(element.shadows))
-
-      doc
+      element.shadows
       |> :xmerl.export_simple_element(:xmerl_xml)
-      |> :lists.flatten()
       |> Kernel.to_string()
     end
   end

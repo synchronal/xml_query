@@ -24,17 +24,12 @@ defmodule XmlQuery.ElementTest do
       assert to_string(element) == ~s|<child age="12" name="Alice"/>|
     end
 
-    @tag :skip
-    test "normalizes indentation" do
+    test "has indentation whitespace removed" do
       %Xq.Element{} = element = @xml |> Xq.find("//child[@age='8']")
 
       assert to_string(element) ==
                """
-               <child age="8" name="Billy">
-                 <pets>
-                   <pet species="cat" name="Simba"/>
-                 </pets>
-               </child>
+               <child age="8" name="Billy"><pets><pet species="cat" name="Simba"/></pets></child>
                """
                |> String.trim()
     end

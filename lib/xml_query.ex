@@ -8,6 +8,7 @@ defmodule XmlQuery do
   import Record
   alias XmlQuery.QueryError
   alias XmlQuery.Xmerl
+  require XmlQuery.Xmerl
 
   @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t()
   @type xml_attribute() :: Xmerl.xml_attribute()
@@ -108,7 +109,7 @@ defmodule XmlQuery do
     {doc, []} =
       xml
       |> String.to_charlist()
-      |> :xmerl_scan.string(quiet: true, xmlbase: ~c"/")
+      |> :xmerl_scan.string(acc_fun: &accumulate_xml/3, quiet: true, space: :normalize, xmlbase: ~c"/")
 
     into(doc)
   end
@@ -122,8 +123,6 @@ defmodule XmlQuery do
          |> parse()
          |> first!("Consider using Enum.map(xml, &#{@module_name}.text/1)") do
       %XmlQuery.Element{shadows: doc} ->
-        [doc] = :xmerl_lib.remove_whitespace(List.wrap(doc))
-
         :xmerl_xpath.string(~c"//text()", doc)
         |> Enum.reduce("", fn node, acc ->
           case XmlQuery.Text.to_string(node) do
@@ -149,6 +148,13 @@ defmodule XmlQuery do
     do: XmlQuery.Text.new(text)
 
   # # #
+
+  defp accumulate_xml({:xmlText, _, _, _, ~c" ", _} = text, acc, str) do
+    {acc, XmlQuery.Xmerl.xmlText(text, :pos), str}
+  end
+
+  defp accumulate_xml(node, acc, str),
+    do: {[node | acc], str}
 
   defp first!([], hint) do
     raise(QueryError, """
