@@ -26,7 +26,7 @@ defmodule XmlQuery.Element do
   defimpl String.Chars do
     def to_string(element) do
       element.shadows
-      |> :xmerl.export_simple_element(:xmerl_xml)
+      |> :xmerl.export_element(:xmerl_xml)
       |> Kernel.to_string()
     end
   end

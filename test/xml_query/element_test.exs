@@ -14,6 +14,9 @@ defmodule XmlQuery.ElementTest do
             <pet species="cat" name="Simba" />
           </pets>
         </child>
+        <child age="5" name="Cindy">
+          <!-- comments -->
+        </child>
       </children>
     </root>
     """
@@ -30,6 +33,16 @@ defmodule XmlQuery.ElementTest do
       assert to_string(element) ==
                """
                <child age="8" name="Billy"><pets><pet species="cat" name="Simba"/></pets></child>
+               """
+               |> String.trim()
+    end
+
+    test "strips comments" do
+      %Xq.Element{} = element = @xml |> Xq.find("//child[@age='5']")
+
+      assert to_string(element) ==
+               """
+               <child age="5" name="Cindy"/>
                """
                |> String.trim()
     end
