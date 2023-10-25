@@ -218,6 +218,83 @@ defmodule XmlQueryTest do
     end
   end
 
+  describe "pretty" do
+    @xml """
+    <?xml version="1.0"?>
+    <root>
+      <child id="empty" />
+      <child id="text-content">P1   </child>
+      <child id="nested-simple">P2 <nested>nested text</nested></child>
+      <child id="nested-deep"><nested><stuff /><content><with><thing>with text</thing><thing with="attr" /><other /></with></content></nested></child>
+    </root>
+    """
+
+    test "pretty prints an empty element" do
+      @xml
+      |> Xq.find("//child[@id='empty']")
+      |> Xq.pretty()
+      |> assert_eq(~s|<child id="empty"/>|)
+    end
+
+    test "pretty prints an element with text" do
+      @xml
+      |> Xq.find("//child[@id='text-content']")
+      |> Xq.pretty()
+      |> assert_eq(~s|<child id="text-content">P1</child>|)
+    end
+
+    test "trims and indents nested content" do
+      @xml
+      |> Xq.find("//child[@id='nested-simple']")
+      |> Xq.pretty()
+      |> assert_eq(
+        String.trim("""
+        <child id="nested-simple">
+          P2
+          <nested>nested text</nested>
+        </child>
+        """)
+      )
+    end
+
+    @tag :skip
+    test "sorts nested tags" do
+      @xml
+      |> Xq.find("//child[@id='nested-deep']")
+      |> Xq.pretty()
+      |> assert_eq(
+        String.trim("""
+        <child id="nested-deep">
+          <nested>
+            <content>
+              <with>
+                <other/>
+                <thing with="attr"/>
+                <thing>with text</thing>
+              </with>
+            </content>
+            <stuff/>
+          </nested>
+        </child>
+        """)
+      )
+    end
+
+    test "pretty prints an attribute" do
+      @xml
+      |> Xq.find("//child[@id='empty']/@id")
+      |> Xq.pretty()
+      |> assert_eq("empty")
+    end
+
+    test "pretty prints a text node" do
+      @xml
+      |> Xq.find!("//child[@id='nested-simple']/nested/text()")
+      |> Xq.pretty()
+      |> assert_eq("nested text")
+    end
+  end
+
   describe "text" do
     @xml """
     <?xml version="1.0"?>

@@ -23,6 +23,11 @@ defmodule XmlQuery.Attribute do
         shadows: attribute
       )
 
+  def pretty(attr) when is_struct(attr, __MODULE__),
+    do: to_string(attr)
+
+  # # #
+
   defimpl String.Chars do
     def to_string(attr) do
       attr.shadows

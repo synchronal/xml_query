@@ -114,6 +114,14 @@ defmodule XmlQuery do
     into(doc)
   end
 
+  @spec pretty(xml()) :: binary()
+  def pretty(node)
+      when is_struct(node, XmlQuery.Element) or is_struct(node, XmlQuery.Attribute) or is_struct(node, XmlQuery.Text),
+      do: node.__struct__.pretty(node)
+
+  def pretty(xml) when is_binary(xml) or is_tuple(xml),
+    do: xml |> parse() |> pretty()
+
   @doc """
   Returns the text value of `xml`.
   """

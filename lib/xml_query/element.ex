@@ -23,11 +23,42 @@ defmodule XmlQuery.Element do
         shadows: element
       )
 
+  def pretty(element) when is_struct(element, __MODULE__),
+    do:
+      element.shadows
+      |> :xmerl.export_element(__MODULE__.PrettyFormatter)
+      |> Kernel.to_string()
+
+  # # #
+
   defimpl String.Chars do
     def to_string(element) do
       element.shadows
       |> :xmerl.export_element(:xmerl_xml)
       |> Kernel.to_string()
     end
+  end
+
+  defmodule PrettyFormatter do
+    def unquote(:"#xml-inheritance#")(), do: []
+
+    def unquote(:"#element#")(tag, [], attrs, _parents, _e),
+      do: :xmerl_lib.empty_tag(tag, attrs)
+
+    def unquote(:"#element#")(tag, [node], attrs, _parents, _e)
+        when is_list(node),
+        do: :xmerl_lib.markup(tag, attrs, [List.flatten(node)])
+
+    def unquote(:"#element#")(tag, contents, attrs, _parents, _e) do
+      [
+        :xmerl_lib.start_tag(tag, attrs),
+        Enum.intersperse([~c"" | contents], ~c"\n  "),
+        ~c"\n",
+        :xmerl_lib.end_tag(tag)
+      ]
+    end
+
+    def unquote(:"#text#")(text),
+      do: :xmerl_lib.export_text(String.trim(to_string(text)))
   end
 end

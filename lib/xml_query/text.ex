@@ -21,9 +21,19 @@ defmodule XmlQuery.Text do
         shadows: text
       )
 
+  def pretty(attr) when is_struct(attr, __MODULE__),
+    do: Kernel.to_string(attr)
+
+  # # #
+
   @doc false
   def to_string(node) when is_record(node, :xmlText),
     do: node |> XmlQuery.Xmerl.xmlText(:value) |> Kernel.to_string()
+
+  def to_string(node) when is_struct(node, __MODULE__),
+    do: Kernel.to_string(node)
+
+  # # #
 
   defimpl String.Chars do
     def to_string(text) do
