@@ -114,6 +114,11 @@ defmodule XmlQuery do
     into(doc)
   end
 
+  @doc """
+  Returns `xml` as a prettified string.
+
+  Elements and text nodes are sorted and indented relative to parent elements.
+  """
   @spec pretty(xml()) :: binary()
   def pretty(node)
       when is_struct(node, XmlQuery.Element) or is_struct(node, XmlQuery.Attribute) or is_struct(node, XmlQuery.Text),

@@ -28,6 +28,7 @@ defmodule XmlQuery.Element do
       element.shadows
       |> :xmerl.export_element(__MODULE__.PrettyFormatter)
       |> Kernel.to_string()
+      |> String.replace("\r", "\n")
 
   # # #
 
@@ -43,16 +44,23 @@ defmodule XmlQuery.Element do
     def unquote(:"#xml-inheritance#")(), do: []
 
     def unquote(:"#element#")(tag, [], attrs, _parents, _e),
-      do: :xmerl_lib.empty_tag(tag, attrs)
+      do: :xmerl_lib.empty_tag(tag, attrs) |> to_string()
 
-    def unquote(:"#element#")(tag, [node], attrs, _parents, _e)
-        when is_list(node),
-        do: :xmerl_lib.markup(tag, attrs, [List.flatten(node)])
+    def unquote(:"#element#")(tag, [[char | _] = node], attrs, _parents, _e)
+        when is_integer(char),
+        do: :xmerl_lib.markup(tag, attrs, [node])
 
     def unquote(:"#element#")(tag, contents, attrs, _parents, _e) do
+      contents = Enum.map(contents, &to_string/1)
+
+      contents =
+        Enum.intersperse([~c"" | Enum.sort(contents)], ~c"\n")
+        |> to_string()
+        |> String.replace("\n", "\n  ")
+
       [
         :xmerl_lib.start_tag(tag, attrs),
-        Enum.intersperse([~c"" | contents], ~c"\n  "),
+        contents,
         ~c"\n",
         :xmerl_lib.end_tag(tag)
       ]

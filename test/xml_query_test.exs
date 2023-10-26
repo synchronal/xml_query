@@ -224,7 +224,7 @@ defmodule XmlQueryTest do
     <root>
       <child id="empty" />
       <child id="text-content">P1   </child>
-      <child id="nested-simple">P2 <nested>nested text</nested></child>
+      <child id="nested-simple">P3 <nested>nested text</nested>  P2  </child>
       <child id="nested-deep"><nested><stuff /><content><with><thing>with text</thing><thing with="attr" /><other /></with></content></nested></child>
     </root>
     """
@@ -243,22 +243,20 @@ defmodule XmlQueryTest do
       |> assert_eq(~s|<child id="text-content">P1</child>|)
     end
 
-    test "trims and indents nested content" do
+    test "trims, sorts, and indents nested content" do
       @xml
       |> Xq.find("//child[@id='nested-simple']")
       |> Xq.pretty()
       |> assert_eq(
         String.trim("""
         <child id="nested-simple">
-          P2
           <nested>nested text</nested>
+          P2
+          P3
         </child>
         """)
       )
-    end
 
-    @tag :skip
-    test "sorts nested tags" do
       @xml
       |> Xq.find("//child[@id='nested-deep']")
       |> Xq.pretty()
