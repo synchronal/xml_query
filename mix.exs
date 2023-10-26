@@ -11,7 +11,7 @@ defmodule XmlQuery.MixProject do
       description: "Some simple XML query functions",
       dialyzer: dialyzer(),
       docs: docs(),
-      elixir: "~> 1.15",
+      elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       homepage_url: @scm_url,
       name: "XmlQuery",
