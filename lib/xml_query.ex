@@ -10,7 +10,7 @@ defmodule XmlQuery do
   alias XmlQuery.Xmerl
   require XmlQuery.Xmerl
 
-  @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t()
+  @type xml() :: xml_binary() | xml_document() | xml_element() | XmlQuery.Element.t() | String.Chars.t()
   @type xml_attribute() :: Xmerl.xml_attribute()
   @type xml_binary() :: binary()
   @type xml_document() :: Xmerl.xml_document()
@@ -114,6 +114,9 @@ defmodule XmlQuery do
     into(doc)
   end
 
+  def parse(%_{} = xml),
+    do: xml |> implements!(String.Chars) |> to_string() |> parse()
+
   @doc """
   Returns `xml` as a prettified string.
 
@@ -189,5 +192,11 @@ defmodule XmlQuery do
 
     #{hint}
     """
+  end
+
+  defp implements!(x, protocol) do
+    if protocol.impl_for(x) == nil,
+      do: raise("Expected #{inspect(x)} to implement protocol #{inspect(protocol)}"),
+      else: x
   end
 end

@@ -205,6 +205,20 @@ defmodule XmlQueryTest do
                |> Xq.parse()
     end
 
+    test "can parse any struct that implements String.Chars" do
+      %Test.Etc.TestNode{contents: "<foo>bar</foo>"}
+      |> Xq.parse()
+      |> Xq.pretty()
+      |> assert_eq(
+        """
+        <test-node>
+          <foo>bar</foo>
+        </test-node>
+        """,
+        :squish
+      )
+    end
+
     test "wrap XML element records in Xq.Element" do
       xml =
         {:xmlElement, :root, :root, [], {:xmlNamespace, [], []}, [], 1, [],
