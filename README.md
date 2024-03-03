@@ -1,42 +1,22 @@
 # XmlQuery
 
-Some simple XML query functions. Delegates much of its work to `:xmerl`, but provides
-an API similar to `HtmlQuery`.
+A concise API for querying XML. There are just 5 main functions:
+`all/2`, `find/2` and `find!/2` for finding things, plus `attr/2` and `text/1` for extracting
+information. There are also a handful of other useful functions, referenced below and described in detail in
+the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html). XML parsing is handled by Erlang/OTP’s
+[xmerl](https://www.erlang.org/doc/man/xmerl) built-in library.
 
-```elixir
-iex> alias XmlQuery, to: Xq
+The input can be:
 
-iex> xml = """
-<?xml version="1.0"?>
-<family>
-  <child age="12" name="Alice" />
-  <child age="9" name="Billy">
-    <toys>
-      <toy name="Voltron">
-        <limb>Leg</limb>
-        <animal>Lion</animal>
-        <color>Blue</color>
-      </toy>
-    </toys>
-  </child>
-</family>
-"""
+* A string of XML.
+* An `Xmerl.xml_attribute()`, `Xmerl.xml_document()`, `Xmerl.xml_element()`, or `Xmerl.xml_text()`.
+* An `XmlQuery.Element` struct.
 
-iex> xml |> Xq.all("//child") |> Enum.map(&Xq.attr(&1, "age"))
-["12", "9"]
+We created a related library called [HtmlQuery](https://hexdocs.pm/html_query/readme.html) which has the same API but
+is used for querying HTML.
 
-iex> xml |> Xq.find!("//toy") |> Xq.text()
-"Leg Lion Blue"
-
-iex> xml |> Xq.find!("//toy/animal") |> Xq.text()
-"Lion"
-```
-
-## API Docs
-
-See the documentation for the main `XmlQuery` module for details and more examples:
-
-<https://hexdocs.pm/xml_query/XmlQuery.html>
+This library is MIT licensed and is part of a growing number of Elixir open source libraries published at
+[github.com/synchronal](https://github.com/synchronal#elixir).
 
 ## Installation
 
@@ -47,6 +27,98 @@ def deps do
   ]
 end
 ```
+
+## Usage
+
+Detailed docs are in the [XmlQuery module docs](https://hexdocs.pm/xml_query/XmlQuery.html); a quick usage
+overview follows.
+
+We typically alias `XmlQuery` to `Xq`:
+
+```elixir
+alias XmlQuery, as: Xq
+```
+
+The rest of these examples use the following XML:
+
+```elixir
+xml = """
+<?xml version="1.0"?>
+<family>
+  <child age="12" name="Alice" />
+  <child age="9" name="Billy">
+    <toys>
+      <toy name="Voltron" part-number="voltr-123">
+        <limb>Leg</limb>
+        <animal>Lion</animal>
+        <color>Blue</color>
+      </toy>
+    </toys>
+  </child>
+</family>
+"""
+```
+
+### Querying
+
+Query functions use XPath selector strings for finding nodes. The
+[Devhints XPath cheatsheet](https://devhints.io/xpath) is a helpful XPath reference.
+
+```elixir
+Xq.find!(xml, "//toy/animal")
+```
+
+The result of a query is an `XmlQuery.Element` struct, a list of `XmlQuery.Element` structs, an `XmlQuery.Attribute`
+struct, or an `XmlQuery.Text` struct. All of these structs implement `String.Chars` so you can convert them to strings
+with `to_string/1`:
+
+```elixir
+Xq.find!(xml, "//toy/animal") |> to_string() # returns "<animal>Lion</animal>"
+```
+
+### Finding
+
+```elixir
+Xq.all(xml, "//child") # returns a list of all the <child> elements
+Xq.find(xml, ~s|//child[@name="Alice"]|) # returns the <child> with name "Alice"
+Xq.find!(xml, ~s|//child[@name="foo"]|) # raises because no such element exists
+```
+
+See the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html) for more details.
+
+### Extracting
+
+`text/1` is the simplest extraction function:
+
+```elixir
+xml |> Xq.find!("//toy") |> Xq.text() # returns "Leg Lion Blue"
+```
+
+`attr/2` returns the value of an attribute:
+
+```elixir
+xml |> Xq.find!(~s|//toy[@part-number="voltr-123"]|) |> Xq.attr("name") # returns "Voltron"
+```
+
+To extract data from multiple XML nodes, we found that it is clearer to compose multiple functions rather than to
+have a more complicated API:
+
+```elixir
+xml |> Xq.all("//toy/*") |> Enum.map(&Xq.text/1) # returns ["Leg", "Lion", "Blue"]
+xml |> Xq.all("//child") |> Enum.map(&Xq.attr(&1, "age")) # returns ["12", "9"]
+```
+
+See the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html) for more details.
+
+### Parsing
+
+`parse/1` parses an XML document and returns an `XmlQuery.Element` struct. It is rarely needed since all the XmlQuery
+functions will parse XML if needed. See the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html) for more details.
+
+### Utilities
+
+`pretty/1` formats XML in a human-friendly format. See the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html)
+for more details.
 
 ## Development
 
