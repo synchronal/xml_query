@@ -3,14 +3,15 @@
 A concise API for querying XML. There are just 5 main functions:
 `all/2`, `find/2` and `find!/2` for finding things, plus `attr/2` and `text/1` for extracting
 information. There are also a handful of other useful functions, referenced below and described in detail in
-the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html). XML parsing is handled by Erlang/OTP’s
-[xmerl](https://www.erlang.org/doc/man/xmerl) built-in library.
+the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html). XML parsing is handled by Erlang/OTP’s built-in
+[xmerl](https://www.erlang.org/doc/man/xmerl) library.
 
 The input can be:
 
 * A string of XML.
 * An `Xmerl.xml_attribute()`, `Xmerl.xml_document()`, `Xmerl.xml_element()`, or `Xmerl.xml_text()`.
 * An `XmlQuery.Element` struct.
+* Anything that implements the `String.Chars` protocol.
 
 We created a related library called [HtmlQuery](https://hexdocs.pm/html_query/readme.html) which has the same API but
 is used for querying HTML.
@@ -123,8 +124,6 @@ for more details.
 ## Development
 
 ```shell
-brew bundle
-
 bin/dev/doctor
 bin/dev/update
 bin/dev/audit
