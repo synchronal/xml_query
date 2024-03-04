@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Documentation updates
+
 ## 0.2.0
 
 - Add `XmlQuery.pretty/1` for printing XML with indentation and sorting.

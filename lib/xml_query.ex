@@ -2,7 +2,38 @@ defmodule XmlQuery do
   # @related [tests](test/xml_query_test.exs)
 
   @moduledoc """
-  Some simple XML query functions.
+  A concise API for querying XML. XML parsing is handled by Erlang/OTP’s built-in
+  [xmerl](https://www.erlang.org/doc/man/xmerl) library.
+
+  ## Data types
+
+  All functions accept XML in the form of a string, an `Xmerl.xml_attribute`, an `Xmerl.xml_document`, an
+  `Xmerl.xml_element`, an `Xmler.xml_text`, an `XmlQuery.Element`, or anything that implements the `String.Chars`
+  protocol.
+
+  ## Query functions
+
+  | `all/2`   | return all elements matching the selector                   |
+  | `find/2`  | return the first element that matches the selector          |
+  | `find!/2` | return the only element that matches the selector, or raise |
+
+  ## Extraction functions
+
+  | `attr/2` | returns the attribute value as a string      |
+  | `text/1` | returns the text contents as a single string |
+
+  ## Parsing & utility functions
+
+  | `parse/1` | parses XML into an `XmlQuery.Element`, `XmlQuery.Attribute`, or XmlQuery.Text.t() |
+  | `pretty/1` | prettifies XML |
+
+  ## Alias
+
+  If you use XmlQuery a lot, you may want to alias it to the recommended shortcut "Xq":
+
+  ```elixir
+  alias XmlQuery, as: Hq
+  ```
   """
 
   import Record
@@ -27,6 +58,13 @@ defmodule XmlQuery do
   @doc """
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
+
+  ```elixir
+  iex> xml = ~s|<cart id="123"> <fruit name="apple" color="red"/> <fruit name="banana" color="yellow"/> </cart>|
+  iex> XmlQuery.all(xml, "//fruit") |> Enum.map(&to_string/1)
+  ["<fruit name=\\"apple\\" color=\\"red\\"/>",
+   "<fruit name=\\"banana\\" color=\\"yellow\\"/>"]
+  ```
   """
   @spec all(xml(), xpath()) :: [XmlQuery.Element.t()]
   def all(xml, xpath) when is_binary(xpath),
@@ -40,6 +78,12 @@ defmodule XmlQuery do
 
   @doc """
   Returns the value of `attr` from the outermost element of `xml`.
+
+  ```elixir
+  iex> xml = ~s|<cart id="123"> <fruit name="apple" color="red"/> <fruit name="banana" color="yellow"/> </cart>|
+  iex> XmlQuery.attr(xml, :id)
+  "123"
+  ```
   """
   @spec attr(xml(), String.t()) :: XmlQuery.Attribute.t() | nil
   def attr(xml, attr) do
@@ -132,6 +176,14 @@ defmodule XmlQuery do
 
   @doc """
   Returns the text value of `xml`.
+
+  ```elixir
+  iex> xml = "<name><first>Alice</first><middle>A.</middle><last>Aliceston</last></name>"
+  iex> XmlQuery.text(xml)
+  "Alice A. Aliceston"
+  iex> xml |> XmlQuery.find("//name/first") |> XmlQuery.text()
+  "Alice"
+  ```
   """
   @spec text(xml()) :: binary()
   def text(xml) do
