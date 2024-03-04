@@ -2,7 +2,7 @@ defmodule XmlQuery.MixProject do
   use Mix.Project
 
   @scm_url "https://github.com/synchronal/xml_query"
-  @version "0.2.0"
+  @version "0.2.1"
 
   def project do
     [

@@ -24,7 +24,7 @@ This library is MIT licensed and is part of a growing number of Elixir open sour
 ```elixir
 def deps do
   [
-    {:xml_query, "~> 0.1.0"}
+    {:xml_query, "~> 0.2.1"}
   ]
 end
 ```
