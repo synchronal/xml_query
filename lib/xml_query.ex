@@ -5,6 +5,10 @@ defmodule XmlQuery do
   A concise API for querying XML. XML parsing is handled by Erlang/OTP’s built-in
   [xmerl](https://www.erlang.org/doc/man/xmerl) library.
 
+  We created a related library called [HtmlQuery](https://hexdocs.pm/html_query/readme.html) which has the same API but
+  is used for querying HTML. You can read more about them in
+  [Querying HTML and XML in Elixir with HtmlQuery and XmlQuery](https://eahanson.com/articles/html-query-xml-query).
+
   ## Data types
 
   All functions accept XML in the form of a string, an `Xmerl.xml_attribute`, an `Xmerl.xml_document`, an

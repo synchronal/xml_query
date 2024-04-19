@@ -14,7 +14,8 @@ The input can be:
 * Anything that implements the `String.Chars` protocol.
 
 We created a related library called [HtmlQuery](https://hexdocs.pm/html_query/readme.html) which has the same API but
-is used for querying HTML.
+is used for querying HTML. You can read more about them in
+[Querying HTML and XML in Elixir with HtmlQuery and XmlQuery](https://eahanson.com/articles/html-query-xml-query).
 
 This library is MIT licensed and is part of a growing number of Elixir open source libraries published at
 [github.com/synchronal](https://github.com/synchronal#elixir).
