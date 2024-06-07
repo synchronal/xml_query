@@ -14,26 +14,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
-              elixir: 1.14.5
+              elixir: 1.14.0
               otp: 25.0
           - pair:
-              elixir: 1.14.5
-              otp: 26.0
-          - pair:
-              elixir: 1.15.7
-              otp: 25.0
-          - pair:
-              elixir: 1.15.7
-              otp: 26.0
-          - pair:
-              elixir: 1.16.0
-              otp: 25.0
-          - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Build Test
     runs-on: ubuntu-20.04
     env:
@@ -69,26 +54,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
-              elixir: 1.14.5
+              elixir: 1.14.0
               otp: 25.0
           - pair:
-              elixir: 1.14.5
-              otp: 26.0
-          - pair:
-              elixir: 1.15.7
-              otp: 25.0
-          - pair:
-              elixir: 1.15.7
-              otp: 26.0
-          - pair:
-              elixir: 1.16.0
-              otp: 25.0
-          - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Build Dev
     runs-on: ubuntu-20.04
     env:
@@ -124,26 +94,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
-              elixir: 1.14.5
+              elixir: 1.14.0
               otp: 25.0
           - pair:
-              elixir: 1.14.5
-              otp: 26.0
-          - pair:
-              elixir: 1.15.7
-              otp: 25.0
-          - pair:
-              elixir: 1.15.7
-              otp: 26.0
-          - pair:
-              elixir: 1.16.0
-              otp: 25.0
-          - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Test
     needs: build_test
     runs-on: ubuntu-20.04
@@ -177,8 +132,8 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Credo + Dialyxir
     needs: build_test
     runs-on: ubuntu-20.04
@@ -220,8 +175,8 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Audit
     needs: build_dev
     runs-on: ubuntu-20.04
@@ -261,8 +216,8 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.16.2
-              otp: 26.2.2
+              elixir: 1.16.3
+              otp: 26.2.5
     name: Publish to Hex
     if: github.ref == 'refs/heads/main'
     needs:
