@@ -63,7 +63,7 @@ defmodule XmlQuery do
   Finds all elements in an XML document that match `xpath`, returning a list of records.
   Depending on the given xpath, the type of the record may be different.
 
-  ```elixir
+  ``` elixir
   iex> xml = ~s|<cart id="123"> <fruit name="apple" color="red"/> <fruit name="banana" color="yellow"/> </cart>|
   iex> XmlQuery.all(xml, "//fruit") |> Enum.map(&to_string/1)
   ["<fruit name=\\"apple\\" color=\\"red\\"/>",
@@ -83,7 +83,7 @@ defmodule XmlQuery do
   @doc """
   Returns the value of `attr` from the outermost element of `xml`.
 
-  ```elixir
+  ``` elixir
   iex> xml = ~s|<cart id="123"> <fruit name="apple" color="red"/> <fruit name="banana" color="yellow"/> </cart>|
   iex> XmlQuery.attr(xml, :id)
   "123"
@@ -103,13 +103,14 @@ defmodule XmlQuery do
   @doc """
   Finds the first element, attribute, or element text in `xml` that matches `xpath`.
 
-  ```elixir
+  ``` elixir
   iex> alias XmlQuery, as: Xq
   iex> xml = \"""
   ...> <?xml version="1.0"?>
   ...> <root><child property="oldest" /><child property="youngest" /></root>
   ...> \"""
   iex> %Xq.Element{name: :child, attributes: [%Xq.Attribute{value: ~c"oldest"}]} = Xq.find(xml, "//child")
+
   ```
   """
   @spec find(xml(), xpath()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | XmlQuery.Text.t() | nil
@@ -129,7 +130,7 @@ defmodule XmlQuery do
   Given an xml tuple that has already been created by `:xmerl`, wraps the tuple in an
   `XmlQuery`-specific struct.
 
-  ```elixir
+  ``` elixir
   iex> xml = \"""
   ...> <?xml version="1.0"?>
   ...> <root />
@@ -141,6 +142,7 @@ defmodule XmlQuery do
   ...> <root property="root-value" />
   ...> \"""
   iex> %Xq.Attribute{name: :property, value: ~c"root-value"} = XmlQuery.find(xml, "//root/@property") |> XmlQuery.parse()
+
   ```
   """
   @spec parse(xml()) :: XmlQuery.Element.t() | XmlQuery.Attribute.t() | XmlQuery.Text.t()
@@ -181,7 +183,7 @@ defmodule XmlQuery do
   @doc """
   Returns the text value of `xml`.
 
-  ```elixir
+  ``` elixir
   iex> xml = "<name><first>Alice</first><middle>A.</middle><last>Aliceston</last></name>"
   iex> XmlQuery.text(xml)
   "Alice A. Aliceston"
