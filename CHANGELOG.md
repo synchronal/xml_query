@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.0.0
+
+- Update development versions to Elixir 1.18.0.
+- **Breaking change:** drop support for Elixir 1.15.0.
+
 ## 1.0.0
 
 - Verify support for Elixir 1.17.0.
