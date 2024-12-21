@@ -1,6 +1,6 @@
 # XmlQuery
 
-A concise API for querying XML. There are just 5 main functions:
+A concise API for querying XML using xpath. There are just 5 main functions:
 `all/2`, `find/2` and `find!/2` for finding things, plus `attr/2` and `text/1` for extracting
 information. There are also a handful of other useful functions, referenced below and described in detail in
 the [module docs](https://hexdocs.pm/xml_query/XmlQuery.html). XML parsing is handled by Erlang/OTP’s built-in

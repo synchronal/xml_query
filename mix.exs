@@ -8,7 +8,7 @@ defmodule XmlQuery.MixProject do
     [
       app: :xml_query,
       deps: deps(),
-      description: "Some simple XML query functions",
+      description: "XML xpath query helpers",
       dialyzer: dialyzer(),
       docs: docs(),
       elixir: "~> 1.16",
