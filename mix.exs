@@ -39,7 +39,7 @@ defmodule XmlQuery.MixProject do
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.28", only: [:docs, :dev], runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
-      {:moar, "~> 2.0", only: [:test]}
+      {:moar, "~> 4.0", only: [:test]}
     ]
 
   defp dialyzer,
