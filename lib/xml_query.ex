@@ -227,6 +227,9 @@ defmodule XmlQuery do
     {acc, XmlQuery.Xmerl.xmlText(text, :pos), str}
   end
 
+  defp accumulate_xml(comment, acc, str) when is_record(comment, :xmlComment),
+    do: {acc, XmlQuery.Xmerl.xmlComment(comment, :pos), str}
+
   defp accumulate_xml(node, acc, str),
     do: {[node | acc], str}
 
